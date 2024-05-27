@@ -38,3 +38,35 @@ The circleci-wdio.sh script performs the following steps:
 5. Executes the WDIO command using yarn wdio run.
    
 By incorporating this script into your CircleCI workflow, you can ensure that the "Rerun failed tests" feature works correctly with your WDIO test framework
+
+# Solution 2
+
+The `remove_prefix.sh` script addresses an additional issue where the `file://` prefix appears in the XML reports generated after the execution of tests. This script removes the `file://` prefix from the `value` and `file` attributes in the XML report files.
+
+# Usage
+
+1. Copy the `remove_prefix.sh` script into your project's directory (e.g., `app/e2e`).
+2. In your CircleCI configuration file, include the following step after the test execution:
+
+    ```yaml
+    steps:
+      - run:
+          name: Remove file:// prefix from JUnit XML reports
+          path: app/e2e/
+          command: |
+            chmod +x ./remove_prefix.sh
+            ./remove_prefix.sh
+          when: always
+      - store_test_results:
+          path: ~/project/app/e2e/reports
+    ```
+
+# Script Details
+
+The `remove_prefix.sh` script performs the following steps:
+1. Specifies the path to the XML report files (`reports` directory).
+2. Iterates over each XML file in the directory.
+3. Removes the `file://` prefix from the `value` and `file` attributes using `sed`.
+4. Updates the XML files in place.
+
+By incorporating these scripts into your CircleCI workflow, you can ensure that both the "Rerun failed tests" feature and the XML reports work correctly with your WDIO test framework.
